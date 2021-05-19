@@ -31,13 +31,15 @@ export default class AI
    *
    * @param int  [board] board.
    * @param bool isMax
+   * @param int  alpha
+   * @param int  beta
    * 
    * @since 1.0.0
    * @author Muhammad Umer Farooq
    *
    * @return int.
    */
-  static minMax(board, isMax)
+  static minMax(board, isMax, alpha, beta)
   {
     let score = Play.whoWin(board)
 
@@ -61,12 +63,16 @@ export default class AI
           if (isMax) board[row][col] = 1
           else board[row][col] = 0
           
-          if (isMax)
-            best = Math.max(best, AI.minMax(board, !isMax))
-          else
-            best = Math.min(best, AI.minMax(board, !isMax))
+          if (isMax) {
+            best = Math.max(best, AI.minMax(board, !isMax, alpha, beta))
+            alpha = Math.max(alpha, best)
+          } else {
+            best = Math.min(best, AI.minMax(board, !isMax, alpha, beta))
+            beta = Math.min(beta, best)
+          }
 
           board[row][col] = -1
+          if (alpha >= beta) return best
         }
       }
     }
@@ -91,7 +97,7 @@ export default class AI
       for (let col = 0; col < board.length; col++) {
         if (board[row][col] == -1) {
           board[row][col] = 1
-          let moveVal = AI.minMax(board, false)
+          let moveVal = AI.minMax(board, false, -Infinity, Infinity)
           board[row][col] = -1
 
           // if it's best move.
